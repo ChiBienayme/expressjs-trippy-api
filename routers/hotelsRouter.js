@@ -2,6 +2,7 @@ const express = require("express");
 const Joi = require("joi");
 const router = express.Router();
 
+// Hotel API
 const hotelsData = require("../datas/hotelsData.json");
 
 const schema = Joi.object({
@@ -42,7 +43,7 @@ router.get("/", (_req, res) => {
 	if (hotelsData.length > 0) {
 		res.json(hotelsData);
 	} else {
-		res.send("No hotels");
+		res.send("No hotel");
 	}
 });
 
@@ -90,12 +91,33 @@ router.delete("/:hotelID", findHotelByID, (req, res) => {
   
     const hotels = req.hotels;
 
-    hotelsData.shift({hotels})
+    hotelsData.splice(hotelsData.indexOf(hotels), 1)
 
     res.json({
         message: "Hotel is deleted",
         hotelsData,
       });
+});
+
+// Advanced CRUDs
+router.get("/hotels", (req, res) => {
+    const filteredHotels = hotelsData.filter((hotel) => {
+		return (
+			hotel.name === req.query.name &&
+			hotel.hasSpa === req.query.hasSpa ||
+            hotel.name === req.query.name &&
+            hotel.priceCategory === req.query.priceCategory
+		);
+	});
+
+	res.json(filteredHotels);
+
+    // const name = req.query.name;
+    // const hasSpa = req.query.hasSpa;
+    // const priceCategory = req.query.priceCategory;
+	
+	// res.json(name, hasSpa, priceCategory);
+
 });
 
 module.exports = router;
