@@ -5,8 +5,9 @@ const router = express.Router();
 const hotelsData = require("../datas/hotelsData.json");
 
 const hotel = Joi.object({
-	hotelID: Joi.string().alphanum().required(),
-	address: Joi.string().alphanum().required(),
+	id: Joi.number().required(),
+    name: Joi.string().alphanum().required(),
+	address: Joi.string().required(),
 	city: Joi.string().alphanum().required(),
     country: Joi.string().alphanum().required(),
     stars: Joi.number().integer().min(1).max(5).strict().required(),
@@ -39,7 +40,7 @@ router.get("/", (_req, res) => {
 
 // Créer la route /hotels/:id  (GET /hotels/:id)
 router.get("/:hotelID", (req, res) => {
-	const hotels = hotelsData[req.params.id - 1]
+	const hotels = hotelsData[req.params.hotelID - 1]
 
 	if (hotels) {
 		res.json(hotels);
@@ -49,8 +50,6 @@ router.get("/:hotelID", (req, res) => {
 			description: "This hotel does not exist",
 		});
 	}
-
-    res.json(hotels)
 });
 
 // Ajouter la possibilité de créer un nouvel hôtel (POST /hotels)

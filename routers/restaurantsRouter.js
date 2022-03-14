@@ -4,9 +4,9 @@ const router = express.Router();
 
 const restaurantsData = require("../datas/restaurantsData.json");
 
-const restaurants = Joi.object({
-	restaurantName: Joi.string().alphanum().required(),
-	address: Joi.string().alphanum().required(),
+const restaurant = Joi.object({
+	name: Joi.string().alphanum().required(),
+	address: Joi.string().required(),
 	city: Joi.string().alphanum().required(),
     country: Joi.string().alphanum().required(),
     stars: Joi.number().integer().min(1).max(5).strict().required(),
@@ -15,7 +15,7 @@ const restaurants = Joi.object({
 });
 
 function validRestaurant(req, res, next) {
-	const validation = restaurants.validate(req.body);
+	const validation = restaurant.validate(req.body);
 
 	if (validation.error) {
 		return res.status(400).json({
@@ -39,12 +39,7 @@ router.get("/", (_req, res) => {
 
 //Créer la route /restaurants/:id  (GET /restaurants/:id)
 router.get("/:restaurantID", (req, res) => {
-	const restaurants = restaurantsData.find((restaurant) => {
-		return (
-			restaurantrestaurantID ===
-			req.params.restaurantID
-		);
-	});
+	const restaurants = restaurantsData[req.params.restaurantID - 1]
 
 	if (restaurants) {
 		res.json(restaurants);
