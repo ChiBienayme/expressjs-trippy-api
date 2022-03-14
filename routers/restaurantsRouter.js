@@ -4,7 +4,7 @@ const router = express.Router();
 
 const restaurantsData = require("../datas/restaurantsData.json");
 
-const restaurant = Joi.object({
+const schema = Joi.object({
 	name: Joi.string().alphanum().required(),
 	address: Joi.string().required(),
 	city: Joi.string().alphanum().required(),
@@ -15,7 +15,7 @@ const restaurant = Joi.object({
 });
 
 function validRestaurant(req, res, next) {
-	const validation = restaurant.validate(req.body);
+	const validation = schema.validate(req.body);
 
 	if (validation.error) {
 		return res.status(400).json({
@@ -26,8 +26,8 @@ function validRestaurant(req, res, next) {
 	next();
 }
 ;
-// function findRestaurant
-function findRestaurant(req, _res, next) {
+// function findRestaurant by ID
+function findRestaurantByID(req, _res, next) {
 	const restaurants = restaurantsData[req.params.restaurantID - 1];
 	req.restaurants = restaurants;
 	next();
@@ -44,7 +44,7 @@ router.get("/", (_req, res) => {
 
 
 //Créer la route /restaurants/:id  (GET /restaurants/:id)
-router.get("/:restaurantID", findRestaurant, (req, res) => {
+router.get("/:restaurantID", findRestaurantByID, (req, res) => {
 
 	const restaurants = req.restaurants;
 
@@ -71,7 +71,7 @@ router.post("/", validRestaurant, (req, res) => {
 });
 
 // Ajouter la possibilité de mettre à jour le nom d’un restaurant (PATCH /restaurants/:id)
-router.patch("/:restaurantID", findRestaurant, (req, res) => {
+router.patch("/:restaurantID", findRestaurantByID, (req, res) => {
 
 	const restaurants = req.restaurants;
 
@@ -84,5 +84,16 @@ router.patch("/:restaurantID", findRestaurant, (req, res) => {
 });
 
 // Ajouter la possibilité d’effacer un restaurant (DELETE /restaurants/:id)
+router.delete("/:restaurantID", findRestaurantByID, (req, res) => {
+
+	const restaurants = req.restaurants;
+
+    restaurantsData.shift({restaurants}) 
+
+    res.json({
+        message: "Restaurant is deleted",
+        restaurantsData,
+      });
+});
 
 module.exports = router;

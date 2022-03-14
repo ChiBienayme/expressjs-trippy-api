@@ -29,8 +29,8 @@ function validHotel(req, res, next) {
 	next();
 }
 
-// function findHotel
-function findHotel(req, _res, next) {
+// function findHotel by ID
+function findHotelByID(req, _res, next) {
 	const hotels = hotelsData[req.params.hotelID - 1];
 	req.hotels = hotels;
 	next();
@@ -47,7 +47,7 @@ router.get("/", (_req, res) => {
 });
 
 // Créer la route /hotels/:id  (GET /hotels/:id)
-router.get("/:hotelID", findHotel, (req, res) => {
+router.get("/:hotelID", findHotelByID, (req, res) => {
 	const hotels = req.hotels;
 
 	if (hotels) {
@@ -73,11 +73,11 @@ router.post("/", validHotel, (req, res) => {
 });
 
 // Ajouter la possibilité de mettre à jour le nom d’un hôtel (PATCH /hotels/:id) 
-router.patch("/:hotelID", findHotel, (req, res) => {
+router.patch("/:hotelID", findHotelByID, (req, res) => {
   
     const hotels = req.hotels;
 
-    hotels.name = req.body.name;
+    hotels.params.id = req.body.name;
 
     res.json({
         message: "Name changed",
@@ -86,5 +86,16 @@ router.patch("/:hotelID", findHotel, (req, res) => {
 });
 
 // Ajouter la possibilité d’effacer un hôtel (DELETE /hotels/:id)
+router.delete("/:hotelID", findHotelByID, (req, res) => {
+  
+    const hotels = req.hotels;
+
+    hotelsData.shift({hotels})
+
+    res.json({
+        message: "Hotel is deleted",
+        hotelsData,
+      });
+});
 
 module.exports = router;
