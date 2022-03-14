@@ -25,9 +25,15 @@ function validRestaurant(req, res, next) {
 	}
 	next();
 }
+;
+// function findRestaurant
+function findRestaurant(req, _res, next) {
+	const restaurants = restaurantsData[req.params.restaurantID - 1];
+	req.restaurants = restaurants;
+	next();
+};
 
 //Créer la route /restaurants qui retournera tous les restaurants (GET /restaurants)
-
 router.get("/", (_req, res) => {
 	if (restaurantsData.length > 0) {
 		res.json(restaurantsData);
@@ -38,8 +44,9 @@ router.get("/", (_req, res) => {
 
 
 //Créer la route /restaurants/:id  (GET /restaurants/:id)
-router.get("/:restaurantID", (req, res) => {
-	const restaurants = restaurantsData[req.params.restaurantID - 1]
+router.get("/:restaurantID", findRestaurant, (req, res) => {
+
+	const restaurants = req.restaurants;
 
 	if (restaurants) {
 		res.json(restaurants);
@@ -64,6 +71,17 @@ router.post("/", validRestaurant, (req, res) => {
 });
 
 // Ajouter la possibilité de mettre à jour le nom d’un restaurant (PATCH /restaurants/:id)
+router.patch("/:restaurantID", findRestaurant, (req, res) => {
+
+	const restaurants = req.restaurants;
+
+    restaurants.name = req.body.name;
+
+    res.json({
+        message: "Name changed",
+        restaurantsData,
+      });
+});
 
 // Ajouter la possibilité d’effacer un restaurant (DELETE /restaurants/:id)
 

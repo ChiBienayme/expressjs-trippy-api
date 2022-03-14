@@ -4,7 +4,7 @@ const router = express.Router();
 
 const hotelsData = require("../datas/hotelsData.json");
 
-const hotel = Joi.object({
+const schema = Joi.object({
 	id: Joi.number().required(),
     name: Joi.string().alphanum().required(),
 	address: Joi.string().required(),
@@ -16,8 +16,9 @@ const hotel = Joi.object({
     priceCategory: Joi.number().integer().min(1).max(3).strict().required(),
 });
 
+// function validate Hotel
 function validHotel(req, res, next) {
-	const validation = hotel.validate(req.body);
+	const validation = schema.validate(req.body);
 
 	if (validation.error) {
 		return res.status(400).json({
@@ -27,6 +28,13 @@ function validHotel(req, res, next) {
 	}
 	next();
 }
+
+// function findHotel
+function findHotel(req, _res, next) {
+	const hotels = hotelsData[req.params.hotelID - 1];
+	req.hotels = hotels;
+	next();
+};
 
 
 // Créer la route /hotels qui retournera tous les hôtels (GET /hotels)
@@ -39,8 +47,8 @@ router.get("/", (_req, res) => {
 });
 
 // Créer la route /hotels/:id  (GET /hotels/:id)
-router.get("/:hotelID", (req, res) => {
-	const hotels = hotelsData[req.params.hotelID - 1]
+router.get("/:hotelID", findHotel, (req, res) => {
+	const hotels = req.hotels;
 
 	if (hotels) {
 		res.json(hotels);
@@ -65,6 +73,17 @@ router.post("/", validHotel, (req, res) => {
 });
 
 // Ajouter la possibilité de mettre à jour le nom d’un hôtel (PATCH /hotels/:id) 
+router.patch("/:hotelID", findHotel, (req, res) => {
+  
+    const hotels = req.hotels;
+
+    hotels.name = req.body.name;
+
+    res.json({
+        message: "Name changed",
+        hotelsData,
+      });
+});
 
 // Ajouter la possibilité d’effacer un hôtel (DELETE /hotels/:id)
 
