@@ -39,13 +39,13 @@ function findHotelByID(req, _res, next) {
 
 
 // Créer la route /hotels qui retournera tous les hôtels (GET /hotels)
-router.get("/", (_req, res) => {
-	if (hotelsData.length > 0) {
-		res.json(hotelsData);
-	} else {
-		res.send("No hotel");
-	}
-});
+// router.get("/", (_req, res) => {
+// 	if (hotelsData.length > 0) {
+// 		res.json(hotelsData);
+// 	} else {
+// 		res.send("No hotel");
+// 	}
+// });
 
 // Créer la route /hotels/:id  (GET /hotels/:id)
 router.get("/:hotelID", findHotelByID, (req, res) => {
@@ -100,24 +100,20 @@ router.delete("/:hotelID", findHotelByID, (req, res) => {
 });
 
 // Advanced CRUDs
-router.get("/hotels", (req, res) => {
-    const filteredHotels = hotelsData.filter((hotel) => {
-		return (
-			hotel.name === req.query.name &&
-			hotel.hasSpa === req.query.hasSpa ||
-            hotel.name === req.query.name &&
-            hotel.priceCategory === req.query.priceCategory
-		);
+router.get("/", (req, res) => {
+	const filters = req.query;
+	const filteredHotels = hotelsData.filter(hotel => {
+		let isValid = true;
+		for (index in filters) {
+			isValid = isValid &&
+			hotel[index].toString() === filters[index];
+		}
+		return isValid;
+
+		
 	});
-
 	res.json(filteredHotels);
+})
 
-    // const name = req.query.name;
-    // const hasSpa = req.query.hasSpa;
-    // const priceCategory = req.query.priceCategory;
-	
-	// res.json(name, hasSpa, priceCategory);
-
-});
 
 module.exports = router;

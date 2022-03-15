@@ -35,13 +35,13 @@ function findRestaurantByID(req, _res, next) {
 }
 
 //Créer la route /restaurants qui retournera tous les restaurants (GET /restaurants)
-router.get("/", (_req, res) => {
-  if (restaurantsData.length > 0) {
-    res.json(restaurantsData);
-  } else {
-    res.send("No restaurant");
-  }
-});
+// router.get("/", (_req, res) => {
+//   if (restaurantsData.length > 0) {
+//     res.json(restaurantsData);
+//   } else {
+//     res.send("No restaurant");
+//   }
+// });
 
 //Créer la route /restaurants/:id  (GET /restaurants/:id)
 router.get("/:restaurantID", findRestaurantByID, (req, res) => {
@@ -91,6 +91,19 @@ router.delete("/:restaurantID", findRestaurantByID, (req, res) => {
     message: "Restaurant is deleted",
     restaurantsData,
   });
+});
+
+// Advanced CRUDs
+router.get("/", (req, res) => {
+  const filters = req.query;
+  const filteredRestaurants = restaurantsData.filter((restaurant) => {
+    let isValid = true;
+    for (index in filters) {
+      isValid = isValid && restaurant[index] === filters[index];
+    }
+    return isValid;
+  });
+  res.json(filteredRestaurants);
 });
 
 module.exports = router;
